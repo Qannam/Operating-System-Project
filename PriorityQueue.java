@@ -143,11 +143,13 @@ public class PriorityQueue<T> {
 		if(pre == null){
 			head = head.next;
 			size--;
+			sizeSum -= Integer.parseInt(current.data.getMemorySize());
 			return current.data;
 		}
 		else{
 			pre.next = pre.next.next;
 			size--;
+			sizeSum -= Integer.parseInt(current.data.getMemorySize());
 			return current.data;
 		}
 			

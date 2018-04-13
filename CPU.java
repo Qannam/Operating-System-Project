@@ -3,7 +3,7 @@ import java.util.Random;
 public class CPU {
 
 	private static ArrayOfPCB ArrayOfPCB;
-	
+	private PriorityQueue JobQueue;
 	private PriorityQueue ReadyQueue;
 	private PriorityQueue RunQueue;
 	private Queue WaitingQueue;
@@ -18,9 +18,10 @@ public class CPU {
 	int clock;
 
 	public CPU(ArrayOfPCB ArrayOfPCB) {
+		// -1 that means it has no size or limit
+		JobQueue = new PriorityQueue(-1);
 		// 132 Megabytes = 135168 Kilobytes
 		ReadyQueue = new PriorityQueue(135168, ArrayOfPCB);
-		// -1 that means it has no size or limit
 		WaitingQueue = new Queue();
 		RunQueue = new PriorityQueue(-1);
 		FinishQueue = new Queue();
@@ -31,13 +32,23 @@ public class CPU {
 		this.ArrayOfPCB = ArrayOfPCB;
 	}
 
-	public void fillReadyQueue() {
-		boolean readyQueueFull = false;
-		while (ArrayOfPCB.list.length() > 0 && !readyQueueFull) {
+	public void fillJobQueue() {
+		while (ArrayOfPCB.list.length() > 0 ) {
 			PCB p = ArrayOfPCB.list.serve();
 			
+			// here i use "MemorySize" as priority
+			JobQueue.enqueue(p, Integer.parseInt(p.getMemorySize()));	
+		}
+
+	}
+	
+	public void fillReadyQueue() {
+		boolean readyQueueFull = false;
+		while (JobQueue.length() > 0 && !readyQueueFull) {
+			PCB p = JobQueue.serve2();
+			
 			if( (Integer.parseInt(p.getMemorySize())+ReadyQueue.getSizeSum()) > ReadyQueue.getMaxMemorySize()){
-				ArrayOfPCB.list.enqueue(p);
+				JobQueue.enqueue(p, Integer.parseInt(p.getMemorySize()));
 				readyQueueFull = true;
 			}
 			else{
@@ -54,7 +65,7 @@ public class CPU {
 
 	public void run() {
 		ArrayOfPCB.run();
-		
+		fillJobQueue();
 		fillReadyQueue();
 
 		
@@ -67,7 +78,7 @@ public class CPU {
 			while (ReadyQueue.length() > 0 && RunQueue.length() == 0) {
 				clock = 0;
 				
-				PCB ReadyProcess = ReadyQueue.serve();
+				PCB ReadyProcess = ReadyQueue.serve2();
 				ReadyProcess.setState("running");
 				fillReadyQueue();
 
