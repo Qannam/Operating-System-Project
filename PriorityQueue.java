@@ -122,6 +122,37 @@ public class PriorityQueue<T> {
 		sizeSum -= Integer.parseInt(pqe.getMemorySize());
 		return pqe;
 	}
+	
+	public PCB serve2(){
+		if(head == null)
+			return null;
+		int highestPriority = Integer.MAX_VALUE;
+		Node<PCB> current = head;
+		while(current != null){
+			if(current.priority < highestPriority)
+				highestPriority = current.priority;
+			current = current.next;
+		}
+		
+		Node<PCB> pre = null;
+		current = head ;
+		while(current.priority != highestPriority){
+			pre = current;
+			current = current.next;
+		}
+		if(pre == null){
+			head = head.next;
+			size--;
+			return current.data;
+		}
+		else{
+			pre.next = pre.next.next;
+			size--;
+			return current.data;
+		}
+			
+		
+	}
 
 
 }

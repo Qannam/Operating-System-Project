@@ -5,16 +5,12 @@ public class PCB {
 	private String CPUTime;
 	private String memorySize;
 	
-	private String readyTime;
 	private String RunningTime;
+	private String RemainingTime;
 	private String waitingTime;
 	
-	public String getReadyTime() {
-		return readyTime;
-	}
-	public void setReadyTime(String readyTime) {
-		this.readyTime = readyTime;
-	}
+	private boolean terminatedNormally ;
+	
 	public String getRunningTime() {
 		return RunningTime;
 	}
@@ -27,14 +23,15 @@ public class PCB {
 	public void setWaitingTime(String waitingTime) {
 		this.waitingTime = waitingTime;
 	}
-	public PCB(String iD, String state, String cPUTime, String memoryTime ,String RunningTime ,String readyTime , String waitingTime ) {
+	public PCB(String iD, String state, String cPUTime, String memorySize ,String RunningTime , String waitingTime ) {
 		ID = iD;
 		this.state = state;
 		CPUTime = cPUTime;
-		this.memorySize = memoryTime;
+		this.memorySize = memorySize;
 		this.waitingTime  = waitingTime;
-		this.readyTime = readyTime;
 		this.RunningTime = RunningTime;
+		terminatedNormally = false;
+		RemainingTime = CPUTime;
 	}
 	
 	public PCB( PCB PCB) {
@@ -43,10 +40,17 @@ public class PCB {
 		this.CPUTime = PCB.getCPUTime();
 		this.memorySize = PCB.getMemorySize();
 		this.waitingTime  = waitingTime;
-		this.readyTime = readyTime;
 		this.RunningTime = RunningTime;
+		terminatedNormally = false;
+		RemainingTime = CPUTime;
 	}
 	
+	public boolean isTerminatedNormally() {
+		return terminatedNormally;
+	}
+	public void setTerminatedNormally(boolean terminatedNormally) {
+		this.terminatedNormally = terminatedNormally;
+	}
 	public String getID() {
 		return ID;
 	}
@@ -71,6 +75,12 @@ public class PCB {
 	}
 	public void setMemorySize(String memoryTime) {
 		this.memorySize = memoryTime;
+	}
+	public String getRemainingTime() {
+		return RemainingTime;
+	}
+	public void setRemainingTime(String remainingTime) {
+		RemainingTime = remainingTime;
 	}
 	
 	

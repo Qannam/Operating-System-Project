@@ -49,16 +49,11 @@ public class CPU {
 			}
 			
 		}
-		System.out.println("/////Ready length :"+ReadyQueue.length());    //test//
 
 	}
 
 	public void run() {
 		ArrayOfPCB.run();
-		System.out.println("PCB Array length :"+ArrayOfPCB.list.length());    //test//
-		System.out.println();													//test//
-		System.out.println();													//test//
-		System.out.println();													//test//
 		
 		fillReadyQueue();
 
@@ -69,19 +64,17 @@ public class CPU {
 			
 			
 			// RunningQueue handling ///////////////////////////////////////////
-			while (ReadyQueue.length() > 0 && 
-					RunQueue.length() == 0) {
+			while (ReadyQueue.length() > 0 && RunQueue.length() == 0) {
 				clock = 0;
 				
-//				System.out.println("Ready size : " + ReadyQueue.getSize() +"//////////////////////////////////////////////////////////////////");     // test //
 				PCB ReadyProcess = ReadyQueue.serve();
 				ReadyProcess.setState("running");
 				fillReadyQueue();
 
 				
 				
-				// here i use "CPUTime" as priority
-				RunQueue.enqueue(ReadyProcess, Integer.parseInt(ReadyProcess.getCPUTime()));
+				// here i use "CPU Remaining Time" as priority
+				RunQueue.enqueue(ReadyProcess, Integer.parseInt(ReadyProcess.getRemainingTime()));
 
 				PCB RunProcess = RunQueue.serve();
 
@@ -96,24 +89,27 @@ public class CPU {
 						// The possibility that there are interrupts is 10%
 						if (val >= 0 && val < 10) {
 							RunProcess.setState("ready");
+							String newRemainingTime = Integer.parseInt(RunProcess.getCPUTime()) - Integer.parseInt(RunProcess.getRunningTime()) +"";
+							RunProcess.setRemainingTime(newRemainingTime);
+							RunProcess.setTerminatedNormally(false);
 						}
 
 						// The possibility that there is an IO request is 20%
 						else if (val >= 10 && val < 30) {
 							RunProcess.setState("waiting");
+							String newRemainingTime = Integer.parseInt(RunProcess.getCPUTime()) - Integer.parseInt(RunProcess.getRunningTime()) +"";
+							RunProcess.setRemainingTime(newRemainingTime);
+							RunProcess.setTerminatedNormally(false);
 						}
-
-						// // The possibility that the busy IO device will
-						// terminate is 20%
-						// else if(val >= 30 && val < 50 ){
-						// RunProcess.setState("termnated");
-						// }
 
 						// The possibility that the program terminates normally
 						// is 5%
 						else if (val >= 50 && val < 55) {
 							RunProcess.setState("termnated");
 							RunProcess.setRunningTime(clock + "");
+							String newRemainingTime = Integer.parseInt(RunProcess.getCPUTime()) - Integer.parseInt(RunProcess.getRunningTime()) +"";
+							RunProcess.setRemainingTime(newRemainingTime);
+							RunProcess.setTerminatedNormally(true);
 						}
 
 						// The possibility that the program terminates
@@ -121,6 +117,9 @@ public class CPU {
 						else if (val >= 55 && val < 56) {
 							RunProcess.setState("termnated");
 							RunProcess.setRunningTime(clock + "");
+							String newRemainingTime = Integer.parseInt(RunProcess.getCPUTime()) - Integer.parseInt(RunProcess.getRunningTime()) +"";
+							RunProcess.setRemainingTime(newRemainingTime);
+							RunProcess.setTerminatedNormally(false);
 						}
 
 						// ...
@@ -132,14 +131,21 @@ public class CPU {
 
 						// here i will increment the the running time
 						RunProcess.setRunningTime(newTime + "");
+						// here i will calculate the the remaining time
+						String newRemainingTime = Integer.parseInt(RunProcess.getCPUTime()) - Integer.parseInt(RunProcess.getRunningTime()) +"";
+						RunProcess.setRemainingTime(newRemainingTime);
+						
 						// here i will check if the time of the process
 						// is finish ?
-						if (Integer.parseInt(RunProcess.getRunningTime()) >= Integer.parseInt(RunProcess.getCPUTime()))
+						if (Integer.parseInt(RunProcess.getRunningTime()) >= Integer.parseInt(RunProcess.getCPUTime())){
 							RunProcess.setState("termnated");
+							RunProcess.setTerminatedNormally(true);
+						}
 					}
 
 					
 					// here i will check the state of the process then i will transfer it to the appropriate queue
+					
 					if (RunProcess.getState().equals("waiting")) {
 						WaitingQueue.enqueue(RunProcess);
 					}
@@ -192,6 +198,9 @@ public class CPU {
 				ArrayOfPCBFlag = true;
 			else
 				ArrayOfPCBFlag = false;
+			
+			
+			
 
 			// WaitingQueue handling ////////////////////////////
 			while (WaitingQueue.length() > 0) {
@@ -199,49 +208,39 @@ public class CPU {
 
 				PCB WaitingProcess = WaitingQueue.serve();
 
-				/*
-				 * here i am checking because may the state of the process is
-				 * not "waiting" when i can not add it into ready queue because
-				 * the ready queue is full
-				 */
-				if (WaitingProcess.getState().equals("waiting")) {
-
 					// here i will generate random time for the IO
 					Random rand = new Random();
 					int max = 200;
 					int min = 100;
 					int ioTime = rand.nextInt((max - min) + 1) + max;
 
-					while (clock < ioTime) {
+					while (clock < ioTime && WaitingProcess.getState().equals("waiting")) {
+						
+						if(clock % 50 == 0){
+						// The possibility that the busy IO device will terminate is 20%
+							int val = new Random().nextInt(100);
+							if(val >= 30 && val < 50 ){
+								WaitingProcess.setState("termnated");
+							}
+
+						}
 						clock++;
 					}
+					if(WaitingProcess.getState().equals("waiting")){
+						
+						WaitingProcess.setState("ready");
+						int newWaitingTime = Integer.parseInt(WaitingProcess.getRemainingTime() + clock);
+						WaitingProcess.setWaitingTime(newWaitingTime + "");
+						
+						ReadyQueue.enqueue(WaitingProcess, Integer.parseInt(WaitingProcess.getRemainingTime()));
+					}
+					else
+						if(WaitingProcess.getState().equals("termnated")){
+							WaitingProcess.setWaitingTime(clock +"");
+							FinishQueue.enqueue(WaitingProcess);
+						}
+						
 
-					WaitingProcess.setState("ready");
-					ReadyQueue.enqueue(WaitingProcess, Integer.parseInt(WaitingProcess.getCPUTime()));
-
-					// /* if the ready queue is full i will return the process
-					// to
-					// * the waiting queue and i will break the loob
-					// */
-					// if (!ReadyQueue.enqueue(WaitingProcess,
-					// Integer.parseInt(WaitingProcess.getMemorySize()))) {
-					// WaitingQueue.enqueue(WaitingProcess);
-					// break;
-					// }
-
-				}
-
-				// /*
-				// * if the state of the process is not "waiting" i will tray to
-				// add it to the ready queue
-				// * if i cannot because the ready queue is full i will break
-				// the loop
-				// */
-				// else if (!ReadyQueue.enqueue(WaitingProcess,
-				// Integer.parseInt(WaitingProcess.getMemorySize()))) {
-				// WaitingQueue.enqueue(WaitingProcess);
-				// break;
-				// }
 
 				// ((END)) WaitingQueue handling
 			}
