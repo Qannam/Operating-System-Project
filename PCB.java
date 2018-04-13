@@ -11,18 +11,6 @@ public class PCB {
 	
 	private boolean terminatedNormally ;
 	
-	public String getRunningTime() {
-		return RunningTime;
-	}
-	public void setRunningTime(String runningTime) {
-		RunningTime = runningTime;
-	}
-	public String getWaitingTime() {
-		return waitingTime;
-	}
-	public void setWaitingTime(String waitingTime) {
-		this.waitingTime = waitingTime;
-	}
 	public PCB(String iD, String state, String cPUTime, String memorySize ,String RunningTime , String waitingTime ) {
 		ID = iD;
 		this.state = state;
@@ -45,7 +33,7 @@ public class PCB {
 		RemainingTime = CPUTime;
 	}
 	
-	public boolean isTerminatedNormally() {
+	public boolean getIsTerminatedNormally() {
 		return terminatedNormally;
 	}
 	public void setTerminatedNormally(boolean terminatedNormally) {
@@ -83,6 +71,18 @@ public class PCB {
 		RemainingTime = remainingTime;
 	}
 	
+	public String getRunningTime() {
+		return RunningTime;
+	}
+	public void setRunningTime(String runningTime) {
+		RunningTime = runningTime;
+	}
+	public String getWaitingTime() {
+		return waitingTime;
+	}
+	public void setWaitingTime(String waitingTime) {
+		this.waitingTime = waitingTime;
+	}
 	
 
 }

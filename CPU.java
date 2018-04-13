@@ -5,7 +5,7 @@ public class CPU {
 	private static ArrayOfPCB ArrayOfPCB;
 	private PriorityQueue JobQueue;
 	private PriorityQueue ReadyQueue;
-	private PriorityQueue RunQueue;
+	private Queue RunQueue;
 	private Queue WaitingQueue;
 	private Queue FinishQueue;
 
@@ -23,7 +23,7 @@ public class CPU {
 		// 132 Megabytes = 135168 Kilobytes
 		ReadyQueue = new PriorityQueue(135168, ArrayOfPCB);
 		WaitingQueue = new Queue();
-		RunQueue = new PriorityQueue(-1);
+		RunQueue = new Queue();
 		FinishQueue = new Queue();
 		ReadyQueueFlag = false;
 		RunQueueFlag = false;
@@ -45,7 +45,7 @@ public class CPU {
 	public void fillReadyQueue() {
 		boolean readyQueueFull = false;
 		while (JobQueue.length() > 0 && !readyQueueFull) {
-			PCB p = JobQueue.serve2();
+			PCB p = JobQueue.serve();
 			
 			if( (Integer.parseInt(p.getMemorySize())+ReadyQueue.getSizeSum()) > ReadyQueue.getMaxMemorySize()){
 				JobQueue.enqueue(p, Integer.parseInt(p.getMemorySize()));
@@ -53,8 +53,8 @@ public class CPU {
 			}
 			else{
 				p.setState("ready");
-				// here i use "MemorySize" as priority
-				ReadyQueue.enqueue(p, Integer.parseInt(p.getMemorySize()));
+				// here i use "CPU Remaining Time" as priority
+				ReadyQueue.enqueue(p, Integer.parseInt(p.getRemainingTime()));
 				ReadyQueueFlag = true;
 				
 			}
@@ -78,14 +78,13 @@ public class CPU {
 			while (ReadyQueue.length() > 0 && RunQueue.length() == 0) {
 				clock = 0;
 				
-				PCB ReadyProcess = ReadyQueue.serve2();
+				PCB ReadyProcess = ReadyQueue.serve();
 				ReadyProcess.setState("running");
 				fillReadyQueue();
 
 				
 				
-				// here i use "CPU Remaining Time" as priority
-				RunQueue.enqueue(ReadyProcess, Integer.parseInt(ReadyProcess.getRemainingTime()));
+				RunQueue.enqueue(ReadyProcess);
 
 				PCB RunProcess = RunQueue.serve();
 
@@ -113,8 +112,7 @@ public class CPU {
 							RunProcess.setTerminatedNormally(false);
 						}
 
-						// The possibility that the program terminates normally
-						// is 5%
+						// The possibility that the program terminates normally is 5%
 						else if (val >= 50 && val < 55) {
 							RunProcess.setState("termnated");
 							RunProcess.setRunningTime(clock + "");
@@ -123,8 +121,7 @@ public class CPU {
 							RunProcess.setTerminatedNormally(true);
 						}
 
-						// The possibility that the program terminates
-						// abnormally is 1%
+						// The possibility that the program terminates abnormally is 1%
 						else if (val >= 55 && val < 56) {
 							RunProcess.setState("termnated");
 							RunProcess.setRunningTime(clock + "");
@@ -146,8 +143,7 @@ public class CPU {
 						String newRemainingTime = Integer.parseInt(RunProcess.getCPUTime()) - Integer.parseInt(RunProcess.getRunningTime()) +"";
 						RunProcess.setRemainingTime(newRemainingTime);
 						
-						// here i will check if the time of the process
-						// is finish ?
+						// here i will check if the time of the process is finish ?
 						if (Integer.parseInt(RunProcess.getRunningTime()) >= Integer.parseInt(RunProcess.getCPUTime())){
 							RunProcess.setState("termnated");
 							RunProcess.setTerminatedNormally(true);
@@ -168,23 +164,7 @@ public class CPU {
 					if (RunProcess.getState().equals("termnated")) {
 						FinishQueue.enqueue(RunProcess);
 					}
-					
-					
-
 				}
-
-				// /*
-				// * if the state of the process is not "waiting" i will tray to
-				// add it to the ready queue
-				// * if i cannot because the ready queue is full i will break
-				// the loop
-				// */
-				// if (!ReadyQueue.enqueue(WaitingProcess,
-				// Integer.parseInt(WaitingProcess.getMemorySize()))) {
-				// WaitingQueue.enqueue(WaitingProcess);
-				// break;
-				// }
-
 				
 				// ((END)) RunningQueue handling
 			}
@@ -223,7 +203,7 @@ public class CPU {
 					Random rand = new Random();
 					int max = 200;
 					int min = 100;
-					int ioTime = rand.nextInt((max - min) + 1) + max;
+					int ioTime = rand.nextInt((max - min) + 1) + min;
 
 					while (clock < ioTime && WaitingProcess.getState().equals("waiting")) {
 						
@@ -240,7 +220,7 @@ public class CPU {
 					if(WaitingProcess.getState().equals("waiting")){
 						
 						WaitingProcess.setState("ready");
-						int newWaitingTime = Integer.parseInt(WaitingProcess.getRemainingTime() + clock);
+						int newWaitingTime = Integer.parseInt(WaitingProcess.getWaitingTime())+ clock;
 						WaitingProcess.setWaitingTime(newWaitingTime + "");
 						
 						ReadyQueue.enqueue(WaitingProcess, Integer.parseInt(WaitingProcess.getRemainingTime()));
@@ -301,7 +281,7 @@ public class CPU {
 		return ReadyQueue;
 	}
 
-	public PriorityQueue getRunQueue() {
+	public Queue getRunQueue() {
 		return RunQueue;
 	}
 
