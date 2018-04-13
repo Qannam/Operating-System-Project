@@ -21,7 +21,7 @@ public class ArrayOfPCB {
 			sc = new Scanner(file);
 			while (sc.hasNextLine()) {
 				String[] splArray = split(sc.nextLine());
-				PCB newPCB = new PCB(splArray[0], "new", splArray[1], splArray[2]);
+				PCB newPCB = new PCB(splArray[0], "new", splArray[1], splArray[2], "0", "0", "0");
 				list.enqueue(newPCB) ;
 			}
 		} catch (FileNotFoundException e) {

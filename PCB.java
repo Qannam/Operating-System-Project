@@ -27,11 +27,14 @@ public class PCB {
 	public void setWaitingTime(String waitingTime) {
 		this.waitingTime = waitingTime;
 	}
-	public PCB(String iD, String state, String cPUTime, String memoryTime) {
+	public PCB(String iD, String state, String cPUTime, String memoryTime ,String RunningTime ,String readyTime , String waitingTime ) {
 		ID = iD;
 		this.state = state;
 		CPUTime = cPUTime;
 		this.memorySize = memoryTime;
+		this.waitingTime  = waitingTime;
+		this.readyTime = readyTime;
+		this.RunningTime = RunningTime;
 	}
 	
 	public PCB( PCB PCB) {
@@ -39,6 +42,9 @@ public class PCB {
 		this.state = PCB.state;
 		this.CPUTime = PCB.getCPUTime();
 		this.memorySize = PCB.getMemorySize();
+		this.waitingTime  = waitingTime;
+		this.readyTime = readyTime;
+		this.RunningTime = RunningTime;
 	}
 	
 	public String getID() {

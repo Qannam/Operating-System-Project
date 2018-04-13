@@ -37,7 +37,7 @@ public class Run {
 //		}
 		
 		
-		ArrayOfPCB ArrayOfPCB = new ArrayOfPCB("/Users/Qannam/Documents/workspace/OS_project/test.txt");
+		ArrayOfPCB ArrayOfPCB = new ArrayOfPCB("D://Users//Qannam//OS Project//test.txt");
 		CPU CPU = new CPU(ArrayOfPCB);
 		CPU.run();
 		
@@ -47,6 +47,7 @@ public class Run {
 			System.out.println("WaitingQueue length: "+CPU.getWaitingQueue().length());
 			System.out.println("RunQueue length: "+CPU.getRunQueue().length());
 			System.out.println("ReadyQueue length: "+CPU.getReadyQueue().length());
+			System.out.println("ArrayOfPCB length: "+ArrayOfPCB.list.length());
 			
 		
 	}

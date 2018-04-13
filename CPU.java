@@ -9,10 +9,11 @@ public class CPU {
 	private Queue WaitingQueue;
 	private Queue FinishQueue;
 
-	private boolean ReadyQueueFlag;
 	// if all flags is false that mean there is no process in the RAM or CPU
+	private boolean ReadyQueueFlag;
 	private boolean RunQueueFlag;
 	private boolean WaitingQueueFlag;
+	private boolean ArrayOfPCBFlag;
 
 	int clock;
 
@@ -37,8 +38,6 @@ public class CPU {
 			
 			if( (Integer.parseInt(p.getMemorySize())+ReadyQueue.getSizeSum()) > ReadyQueue.getMaxMemorySize()){
 				ArrayOfPCB.list.enqueue(p);
-				
-				
 				readyQueueFull = true;
 			}
 			else{
@@ -65,18 +64,21 @@ public class CPU {
 
 		
 		// here i will keep running until all the queues become empty
-		while (ReadyQueueFlag || RunQueueFlag || WaitingQueueFlag) {
+		while (ReadyQueueFlag || RunQueueFlag || WaitingQueueFlag || ArrayOfPCBFlag ) {
 
 			
 			
 			// RunningQueue handling ///////////////////////////////////////////
-			while (ReadyQueue.length() > 0 && RunQueue.length() == 0) {
+			while (ReadyQueue.length() > 0 && 
+					RunQueue.length() == 0) {
 				clock = 0;
-
+				
+//				System.out.println("Ready size : " + ReadyQueue.getSize() +"//////////////////////////////////////////////////////////////////");     // test //
 				PCB ReadyProcess = ReadyQueue.serve();
+				ReadyProcess.setState("running");
 				fillReadyQueue();
 
-				ReadyProcess.setState("running");
+				
 				
 				// here i use "CPUTime" as priority
 				RunQueue.enqueue(ReadyProcess, Integer.parseInt(ReadyProcess.getCPUTime()));
@@ -126,7 +128,8 @@ public class CPU {
 					}
 					
 					if (RunProcess.getState().equals("running")) {
-						int newTime = Integer.parseInt(RunProcess.getCPUTime()) + 1;
+						int newTime = Integer.parseInt(RunProcess.getRunningTime()) + 1;
+
 						// here i will increment the the running time
 						RunProcess.setRunningTime(newTime + "");
 						// here i will check if the time of the process
@@ -184,6 +187,11 @@ public class CPU {
 				ReadyQueueFlag = true;
 			else
 				ReadyQueueFlag = false;
+			
+			if (ArrayOfPCB.list.length() > 0)
+				ArrayOfPCBFlag = true;
+			else
+				ArrayOfPCBFlag = false;
 
 			// WaitingQueue handling ////////////////////////////
 			while (WaitingQueue.length() > 0) {
@@ -209,7 +217,7 @@ public class CPU {
 					}
 
 					WaitingProcess.setState("ready");
-					WaitingQueue.enqueue(WaitingProcess);
+					ReadyQueue.enqueue(WaitingProcess, Integer.parseInt(WaitingProcess.getCPUTime()));
 
 					// /* if the ready queue is full i will return the process
 					// to
@@ -253,6 +261,11 @@ public class CPU {
 				ReadyQueueFlag = true;
 			else
 				ReadyQueueFlag = false;
+			
+			if (ArrayOfPCB.list.length() > 0)
+				ArrayOfPCBFlag = true;
+			else
+				ArrayOfPCBFlag = false;
 
 		}
 	}
