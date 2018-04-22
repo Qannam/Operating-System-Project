@@ -1,37 +1,24 @@
-
 public class PCB {
 	private String ID;
 	private String state;
 	private String CPUTime;
 	private String memorySize;
 	
-	private String readyTime;
 	private String RunningTime;
+	private String RemainingTime;
 	private String waitingTime;
 	
-	public String getReadyTime() {
-		return readyTime;
-	}
-	public void setReadyTime(String readyTime) {
-		this.readyTime = readyTime;
-	}
-	public String getRunningTime() {
-		return RunningTime;
-	}
-	public void setRunningTime(String runningTime) {
-		RunningTime = runningTime;
-	}
-	public String getWaitingTime() {
-		return waitingTime;
-	}
-	public void setWaitingTime(String waitingTime) {
-		this.waitingTime = waitingTime;
-	}
-	public PCB(String iD, String state, String cPUTime, String memoryTime) {
+	private boolean terminatedNormally ;
+	
+	public PCB(String iD, String state, String cPUTime, String memorySize ,String RunningTime , String waitingTime ) {
 		ID = iD;
 		this.state = state;
 		CPUTime = cPUTime;
-		this.memorySize = memoryTime;
+		this.memorySize = memorySize;
+		this.waitingTime  = waitingTime;
+		this.RunningTime = RunningTime;
+		terminatedNormally = false;
+		RemainingTime = CPUTime;
 	}
 	
 	public PCB( PCB PCB) {
@@ -39,8 +26,18 @@ public class PCB {
 		this.state = PCB.state;
 		this.CPUTime = PCB.getCPUTime();
 		this.memorySize = PCB.getMemorySize();
+		this.waitingTime  = waitingTime;
+		this.RunningTime = RunningTime;
+		terminatedNormally = false;
+		RemainingTime = CPUTime;
 	}
 	
+	public boolean getIsTerminatedNormally() {
+		return terminatedNormally;
+	}
+	public void setTerminatedNormally(boolean terminatedNormally) {
+		this.terminatedNormally = terminatedNormally;
+	}
 	public String getID() {
 		return ID;
 	}
@@ -66,7 +63,25 @@ public class PCB {
 	public void setMemorySize(String memoryTime) {
 		this.memorySize = memoryTime;
 	}
+	public String getRemainingTime() {
+		return RemainingTime;
+	}
+	public void setRemainingTime(String remainingTime) {
+		RemainingTime = remainingTime;
+	}
 	
+	public String getRunningTime() {
+		return RunningTime;
+	}
+	public void setRunningTime(String runningTime) {
+		RunningTime = runningTime;
+	}
+	public String getWaitingTime() {
+		return waitingTime;
+	}
+	public void setWaitingTime(String waitingTime) {
+		this.waitingTime = waitingTime;
+	}
 	
 
 }

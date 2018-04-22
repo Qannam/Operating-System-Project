@@ -3,52 +3,40 @@ import java.util.Random;
 public class Run {
 
 	public static void main(String[] args) {
-//		DataGeneration d = new  DataGeneration();
-//		ArrayOfPCB a = new ArrayOfPCB();
-//		d.generate();
-//		
-//		
-//		a.setPCBArray();
-//		for (int i = 0; i < a.index; i++) {
-//			System.out.println(a.list[i].getID());
-//			System.out.println(a.list[i].getState());
-//			System.out.println(a.list[i].getCPUTime());
-//			System.out.println(a.list[i].getMemoryTime());
-//			
-//			System.out.println();
-//			System.out.println();
-//
-//		}
-			
-//		long clock = System.currentTimeMillis();
-//		for(int i = 0 ; i < 1000 ; i++){
-//			long time = System.currentTimeMillis();
-//            long workTime = time - clock;
-//            clock = time;
-//            
-//            System.out.println(workTime);
-//		}
-//		int countr = 1;
-//		for(int i = 0 ; i < 100 ; i++){
-//			if(new Random().nextInt(100) < 25)	{
-//				System.out.println(countr++);
-//			}
-//				
-//		}
+		DataGeneration d = new  DataGeneration();
+		d.generate();
+	
+		ArrayOfPCB ArrayOfPCB = new ArrayOfPCB("/Users/Qannam/Documents/workspace/OS_project/test");
 		
-		
-		ArrayOfPCB ArrayOfPCB = new ArrayOfPCB("/Users/Qannam/Documents/workspace/OS_project/test.txt");
 		CPU CPU = new CPU(ArrayOfPCB);
 		CPU.run();
 		
-	
+		double numberOfJobs = CPU.getFinishQueue().length();
+		System.out.println("The number of initially generated jobs stored on the H-disk: "+(int)numberOfJobs);
 		
-			System.out.println("FinishQueue length: "+CPU.getFinishQueue().length());
-			System.out.println("WaitingQueue length: "+CPU.getWaitingQueue().length());
-			System.out.println("RunQueue length: "+CPU.getRunQueue().length());
-			System.out.println("ReadyQueue length: "+CPU.getReadyQueue().length());
+		double sumSize = 0;
+		double executionNormally = 0 ;
+		double executionAbnormally = 0 ;
+		int CPUBoundJobs = 0 ;
+
+		while(CPU.getFinishQueue().length() > 0){
+			PCB p = CPU.getFinishQueue().serve();
 			
-		
+			sumSize += Integer.parseInt(p.getMemorySize());
+			
+			if(p.getIsTerminatedNormally())
+				executionNormally++;
+			else
+				executionAbnormally++;
+			
+			if(Integer.parseInt(p.getRunningTime()) > Integer.parseInt(p.getWaitingTime()))
+				CPUBoundJobs++;
+		}
+		System.out.println("The average program size of all jobs: "+(int)(sumSize / numberOfJobs) );
+		System.out.println("The average number of jobs that have completed their execution normally: "+executionNormally / numberOfJobs *100 +"%");
+		System.out.println("The average number of jobs that have completed their execution abnormally: "+executionAbnormally / numberOfJobs *100+"%");
+		System.out.println("The number of CPU bound jobs: "+CPUBoundJobs);
+
 	}
 
 }
